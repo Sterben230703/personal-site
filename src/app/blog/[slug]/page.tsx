@@ -9,9 +9,10 @@ interface PostPageProps {
 }
 
 export default function PostPage({ params }: PostPageProps) {
+  const { slug } = params;
   let post;
   try {
-    post = getPostBySlug(params.slug);
+    post = getPostBySlug(slug);
   } catch {
     notFound();
   }
