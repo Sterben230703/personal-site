@@ -13,6 +13,7 @@
     "gray-matter": "^4.0.3",
     "luxon": "^3.6.1",
     "marked": "^15.0.12",
+    "mongoose": "^8.17.2",
     "next": "15.3.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

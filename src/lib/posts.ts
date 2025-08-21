@@ -1,54 +1,31 @@
 import fs from 'fs';
 import path from 'path';
-import matter from 'gray-matter';
-import { DateTime } from 'luxon';
+
+export type BlogPost = {
+	slug: string;
+	title: string;
+	content: string;
+};
 
 const postsDirectory = path.join(process.cwd(), 'src/posts');
 
-export type BlogPost = {
-  slug: string;
-  title: string;
-  date: string;
-  tags?: string[];
-  content: string;
-  year: string;
-};
-
 export function getAllPosts(): BlogPost[] {
-  const fileNames = fs.readdirSync(postsDirectory);
-  return fileNames.map(file => {
-    const fullPath = path.join(postsDirectory, file);
-    const fileContents = fs.readFileSync(fullPath, 'utf8');
-    const { data, content } = matter(fileContents);
-    return {
-      slug: file.replace(/\.md$/, ''),
-      ...data,
-      content,
-      year: DateTime.fromISO(data.date).toFormat('yyyy'),
-    } as BlogPost;
-  });
-}
-
-export function getPostsGroupedByYear(): [string, BlogPost[]][] {
-  const posts = getAllPosts();
-  const grouped: Record<string, BlogPost[]> = {};
-
-  posts.forEach(post => {
-    if (!grouped[post.year]) grouped[post.year] = [];
-    grouped[post.year].push(post);
-  });
-
-  return Object.entries(grouped).sort((a, b) => b[0].localeCompare(a[0]));
+	const files = fs.readdirSync(postsDirectory).filter(f => f.endsWith('.md'));
+	return files.map(filename => {
+		const slug = filename.replace(/\.md$/, '');
+		const filePath = path.join(postsDirectory, filename);
+		const content = fs.readFileSync(filePath, 'utf-8');
+		const titleMatch = content.match(/^#\s+(.*)/m);
+		const title = titleMatch ? titleMatch[1] : slug;
+		return { slug, title, content };
+	});
 }
 
 export function getPostBySlug(slug: string): BlogPost {
-  const fullPath = path.join(postsDirectory, `${slug}.md`);
-  const fileContents = fs.readFileSync(fullPath, 'utf8');
-  const { data, content } = matter(fileContents);
-  return {
-    slug,
-    ...data,
-    content,
-    year: DateTime.fromISO(data.date).toFormat('yyyy'),
-  } as BlogPost;
+	const filePath = path.join(postsDirectory, `${slug}.md`);
+	if (!fs.existsSync(filePath)) throw new Error('Post not found');
+	const content = fs.readFileSync(filePath, 'utf-8');
+	const titleMatch = content.match(/^#\s+(.*)/m);
+	const title = titleMatch ? titleMatch[1] : slug;
+	return { slug, title, content };
 }

@@ -23,15 +23,11 @@ export default function Layout({ title = 'My Portfolio', children }: LayoutProps
       </Head>
 
       <div className="layout">
-        <nav>
-          <ul>
-            <li><Link href="/">Home</Link></li>
-            <li><Link href="/blog">Posts</Link></li>
-            <li><Link href="/about">About</Link></li>
-          </ul>
-        </nav>
-
         <main>{children}</main>
+        {/* <div>
+          {children}
+        </div> */}
+  
       </div>
     </>
   );
