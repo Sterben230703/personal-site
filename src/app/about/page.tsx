@@ -14,9 +14,11 @@ export default function AboutPage() {
         Currently, I’m deeply interested in:
       </h2>
       <ul className="space-y-1 list-disc list-inside text-gray-700">
-        <li>🖥️ Firmware & Linux Kernel Development</li>
-        <li>🤖 Artificial Intelligence & Large Language Models (LLMs)</li>
+        <li>💻 Software Engineering</li>
         <li>🏆 Competitive Programming</li>
+        <li>🤖 Artificial Intelligence & Large Language Models (LLMs)</li>
+        <li>🖥️ Firmware & Linux Kernel Development</li>
+
       </ul>
       <p className="mt-3">
         I enjoy the blend of low-level systems work and cutting-edge AI research, and I’m constantly exploring ways to connect both worlds.

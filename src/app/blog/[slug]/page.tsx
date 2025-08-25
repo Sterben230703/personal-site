@@ -24,7 +24,7 @@ export default async function PostPage({ params }: PostPageProps) {
   return (
     <Layout title={post.title}>
       <article>
-        <h1>{post.title}</h1>
+        {/* <h1>{post.title}</h1> */}
         <div dangerouslySetInnerHTML={{ __html: html }} />
       </article>
     </Layout>
