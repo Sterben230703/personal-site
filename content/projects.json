@@ -1,0 +1,14 @@
+[
+  {
+    "slug": "personal-site",
+    "name": "Personal Site",
+    "category": "Web",
+    "description": "A personal website built with Next.js 15 featuring a tech blog, project showcase, and dual-theme design.",
+    "longDescription": "This personal website serves as a platform for blogging about technology, showcasing projects, and maintaining private learning logs. Built with Next.js 15, MongoDB, and a custom theme system with classic and system-aesthetic modes.",
+    "techStack": ["Next.js", "TypeScript", "MongoDB", "Tailwind CSS"],
+    "image": "",
+    "github": "",
+    "live": "",
+    "featured": true
+  }
+]
