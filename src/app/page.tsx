@@ -40,11 +40,11 @@ const TECH_STACK = [
   { category: 'Cloud & DB', items: ['GCP', 'MongoDB', 'PostgreSQL'] },
 ];
 
-const SOCIALS = [
-  { name: 'GitHub',     url: 'https://github.com/anandjaiswal',         Icon: GithubIcon,     sub: 'anandjaiswal'  },
-  { name: 'LinkedIn',   url: 'https://linkedin.com/in/anandjaiswal',     Icon: LinkedinIcon,   sub: 'anandjaiswal'  },
-  { name: 'Codeforces', url: 'https://codeforces.com/profile/-Sterben-', Icon: CodeforcesIcon, sub: 'Expert · 1628' },
-  { name: 'LeetCode',   url: 'https://leetcode.com/u/Sterben',           Icon: LeetcodeIcon,   sub: 'Knight · 1929' },
+const BASE_SOCIALS = [
+  { name: 'GitHub',     url: 'https://github.com/Sterben230703',           Icon: GithubIcon,     sub: 'Sterben230703'  },
+  { name: 'LinkedIn',   url: 'https://www.linkedin.com/in/abstractanand/', Icon: LinkedinIcon,   sub: 'abstractanand'  },
+  { name: 'Codeforces', url: 'https://codeforces.com/profile/-Sterben-',  Icon: CodeforcesIcon, sub: 'Expert · …'     },
+  { name: 'LeetCode',   url: 'https://leetcode.com/u/_Sterben',           Icon: LeetcodeIcon,   sub: 'Knight · …'     },
 ];
 
 const EXPERIENCE = [
@@ -100,19 +100,13 @@ const MONTH_GAP = 12;
 
 // ─── Heatmap helpers ──────────────────────────────────────────────────────────
 
-function seededRand(seed: number): number {
-  const x = Math.sin(seed + 1) * 10000;
-  return x - Math.floor(x);
-}
+type HeatCell = { level: number; date: Date; count: number };
 
-type HeatCell = { level: number; date: Date };
-
-function buildHeatmap(): HeatCell[][] {
+function buildEmptyHeatmap(): HeatCell[][] {
   const today = new Date();
   const start = new Date(today);
   start.setDate(start.getDate() - 364);
-  // Align to the nearest Monday (week starts Mon)
-  const day = start.getDay(); // 0=Sun,1=Mon,...,6=Sat
+  const day = start.getDay();
   start.setDate(start.getDate() - (day === 0 ? 6 : day - 1));
 
   const weeks: HeatCell[][] = [];
@@ -122,16 +116,31 @@ function buildHeatmap(): HeatCell[][] {
       const date = new Date(start);
       date.setDate(start.getDate() + w * 7 + d);
       const isFuture = date.getTime() > today.getTime();
-      let level = -1;
-      if (!isFuture) {
-        const r = seededRand(Math.floor(date.getTime() / 86400000));
-        level = r < 0.45 ? 0 : r < 0.65 ? 1 : r < 0.80 ? 2 : r < 0.92 ? 3 : 4;
-      }
-      week.push({ level, date });
+      week.push({ level: isFuture ? -1 : 0, date, count: 0 });
     }
     weeks.push(week);
   }
   return weeks;
+}
+
+function mergeIntoHeatmap(
+  skeleton: HeatCell[][],
+  counts: Record<string, number>,
+): HeatCell[][] {
+  // Collect all non-zero values to compute quantile thresholds
+  const nonZero = Object.values(counts).filter(c => c > 0).sort((a, b) => a - b);
+  const q = (p: number) => nonZero[Math.floor(nonZero.length * p)] ?? 1;
+  const t1 = q(0.25), t2 = q(0.50), t3 = q(0.75);
+
+  return skeleton.map(week =>
+    week.map(cell => {
+      if (cell.level < 0) return cell; // future
+      const key = cell.date.toISOString().slice(0, 10);
+      const count = counts[key] ?? 0;
+      const level = count === 0 ? 0 : count <= t1 ? 1 : count <= t2 ? 2 : count <= t3 ? 3 : 4;
+      return { ...cell, count, level };
+    })
+  );
 }
 
 function heatColor(isSystem: boolean, level: number): string {
@@ -164,10 +173,11 @@ export default function Home() {
 
   const [heatmap, setHeatmap]         = useState<HeatCell[][]>([]);
   const [monthLabels, setMonthLabels] = useState<{ label: string; col: number; startDay: number }[]>([]);
+  const [heatLoading, setHeatLoading] = useState(true);
+  const [socials, setSocials]         = useState(BASE_SOCIALS);
+  const [showScrollHint, setShowScrollHint] = useState(false);
 
-  useEffect(() => {
-    const data = buildHeatmap();
-    setHeatmap(data);
+  function computeMonthLabels(data: HeatCell[][]) {
     const labels: { label: string; col: number; startDay: number }[] = [];
     let lastMonth = -1;
     data.forEach((week, wi) => {
@@ -186,7 +196,58 @@ export default function Home() {
         }
       }
     });
-    setMonthLabels(labels);
+    return labels;
+  }
+
+  useEffect(() => {
+    const skeleton = buildEmptyHeatmap();
+    setHeatmap(skeleton);
+    setMonthLabels(computeMonthLabels(skeleton));
+
+    Promise.all([
+      fetch('/api/heatmap/github').then(r => r.ok ? r.json() : {}),
+      fetch('/api/heatmap/codeforces').then(r => r.ok ? r.json() : {}),
+      fetch('/api/heatmap/leetcode').then(r => r.ok ? r.json() : {}),
+      fetch('/api/heatmap/site').then(r => r.ok ? r.json() : {}),
+    ]).then(([gh, cf, lc, site]) => {
+      // OR: a day is active if ANY platform has activity.
+      // Count = max across platforms so a heavy CF day doesn't drown a light GH day.
+      const merged: Record<string, number> = {};
+      for (const map of [gh, cf, lc, site] as Record<string, number>[]) {
+        for (const [date, count] of Object.entries(map)) {
+          merged[date] = Math.max(merged[date] ?? 0, count);
+        }
+      }
+      const filled = mergeIntoHeatmap(skeleton, merged);
+      setHeatmap(filled);
+      setHeatLoading(false);
+    }).catch(() => setHeatLoading(false));
+
+    fetch('/api/ratings').then(r => r.ok ? r.json() : null).then(data => {
+      if (!data) return;
+      setSocials(prev => prev.map(s => {
+        if (s.name === 'Codeforces' && data.codeforces)
+          return { ...s, sub: `${data.codeforces.title} · ${data.codeforces.rating}` };
+        if (s.name === 'LeetCode' && data.leetcode)
+          return { ...s, sub: `${data.leetcode.title} · ${data.leetcode.rating}` };
+        return s;
+      }));
+    }).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    setShowScrollHint(true);
+    const scroller = document.querySelector('main') as HTMLElement | null;
+    const target = scroller ?? window;
+    const hide = () => {
+      const pos = scroller ? scroller.scrollTop : window.scrollY;
+      if (pos > 80) {
+        setShowScrollHint(false);
+        target.removeEventListener('scroll', hide);
+      }
+    };
+    target.addEventListener('scroll', hide, { passive: true });
+    return () => target.removeEventListener('scroll', hide);
   }, []);
 
   const mono = 'JetBrains Mono, monospace';
@@ -232,6 +293,7 @@ export default function Home() {
           flexDirection: 'column',
           alignItems: 'center',
           overflow: 'hidden',
+          paddingBottom: '7rem',
         }}
       >
         {/* ── Profile ───────────────────────────────────────────────────────── */}
@@ -269,7 +331,7 @@ export default function Home() {
           </p>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', justifyContent: 'center', marginTop: '0.15rem' }}>
-            {SOCIALS.map(({ name, url, Icon, sub }) => (
+            {socials.map(({ name, url, Icon, sub }) => (
               <a key={name} href={url} target="_blank" rel="noreferrer"
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
@@ -336,8 +398,8 @@ export default function Home() {
         </div>
 
         {/* ── Activity Heatmap ──────────────────────────────────────────────── */}
-        <div style={{ marginTop: 'auto', paddingTop: '1rem', flexShrink: 0, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <SectionLabel label="Activity Heatmap" style={{ marginBottom: '0.25rem' }} />
+        <div style={{ marginTop: 'auto', paddingTop: '0.25rem', flexShrink: 0, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <SectionLabel label={heatLoading ? 'Activity Heatmap — loading…' : 'Activity Heatmap (GitHub · Codeforces · LeetCode · Site)'} style={{ marginBottom: '0.25rem' }} />
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.58rem', opacity: 0.35, fontFamily: mono, marginBottom: '0.4rem' }}>
             <span>less</span>
             {[0,1,2,3,4].map(l => (
@@ -382,7 +444,7 @@ export default function Home() {
 
                 const mkCell = (cell: HeatCell, visible: boolean, key: number) => (
                   <div key={key}
-                    title={visible && cell.level >= 0 ? cell.date.toDateString() : undefined}
+                    title={visible && cell.level >= 0 ? `${cell.count} contributions · ${cell.date.toDateString()}` : undefined}
                     style={{
                       width: CELL, height: CELL,
                       backgroundColor: visible ? heatColor(isSystem, cell.level) : 'transparent',
@@ -418,19 +480,14 @@ export default function Home() {
             </div>
           </div>
 
-          {/* scroll hint */}
-          <div style={{ marginTop: '0.6rem', fontSize: '0.6rem', opacity: 0.25, fontFamily: mono, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-            <span>↓</span>
-            <span>scroll for experience</span>
-            <span>↓</span>
-          </div>
+          {/* floating scroll hint — rendered at root level below */}
         </div>
       </div>
 
       {/* ════════════════════════════════════════════════════════════════════════
           BELOW THE FOLD — experience, revealed on scroll
       ════════════════════════════════════════════════════════════════════════ */}
-      <div style={{ width: '100%', maxWidth: 740, paddingTop: '3rem', paddingBottom: '3rem' }}>
+      <div id="experience" style={{ width: '100%', maxWidth: 740, paddingTop: '3rem', paddingBottom: '3rem' }}>
 
         {/* ── Experience ────────────────────────────────────────────────────── */}
         <SectionLabel label="Experience" />
@@ -546,6 +603,64 @@ export default function Home() {
         </div>
 
       </div>
+
+      {/* ── Floating scroll hint ──────────────────────────────────────────── */}
+      {showScrollHint && (
+        <div
+          onClick={() => {
+            setShowScrollHint(false);
+            document.getElementById('experience')?.scrollIntoView({ behavior: 'smooth' });
+          }}
+          style={{
+            position: 'fixed',
+            bottom: '1rem',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 50,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '0.3rem',
+            cursor: 'pointer',
+            animation: 'fadeInUp 0.4s ease',
+          }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            padding: '0.45rem 1rem',
+            borderRadius: isSystem ? 0 : '2rem',
+            border: isSystem ? '2px solid #000' : '1px solid rgba(255,255,255,0.12)',
+            backgroundColor: isSystem ? 'var(--card-bg)' : 'rgba(30,33,40,0.85)',
+            backdropFilter: 'blur(8px)',
+            boxShadow: isSystem ? '3px 3px 0 #000' : '0 4px 20px rgba(0,0,0,0.4)',
+            fontSize: '0.7rem',
+            fontFamily: mono,
+            color: 'var(--text-color)',
+            opacity: 0.9,
+            letterSpacing: '0.04em',
+          }}>
+            <span>scroll for experience</span>
+          </div>
+          <div style={{
+            fontSize: '1rem',
+            animation: 'bounce 1.2s ease infinite',
+            color: 'var(--text-color)',
+            opacity: 0.6,
+          }}>↓</div>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes bounce {
+          0%, 100% { transform: translateY(0); }
+          50%       { transform: translateY(5px); }
+        }
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+          to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }

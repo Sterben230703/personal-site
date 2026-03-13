@@ -40,7 +40,7 @@ export default function Sidebar() {
       <aside className="sidebar sidebar-system">
         {/* Header */}
         <div className="sys-sidebar-header">
-          <h1 className="sys-sidebar-title">[SYS_ARCH]</h1>
+          <h1 className="sys-sidebar-title">[ANAND_JAISWAL]</h1>
           <p className="sys-sidebar-version">CORE_INDEX_V2.0.4</p>
         </div>
 
@@ -68,10 +68,10 @@ export default function Sidebar() {
             <p># STATUS: ONLINE</p>
           </div>
           <div className="sys-sidebar-socials">
-            <a href="https://github.com/anandjaiswal" target="_blank" rel="noreferrer" className="sys-social-link">
+            <a href="https://github.com/Sterben230703" target="_blank" rel="noreferrer" className="sys-social-link">
               <GithubIcon />
             </a>
-            <a href="https://linkedin.com/in/anandjaiswal" target="_blank" rel="noreferrer" className="sys-social-link">
+            <a href="https://www.linkedin.com/in/abstractanand/" target="_blank" rel="noreferrer" className="sys-social-link">
               <LinkedinIcon />
             </a>
           </div>
@@ -124,10 +124,10 @@ export default function Sidebar() {
           <p># STATUS: ONLINE</p>
         </div>
         <div className="sys-sidebar-socials">
-          <a href="https://github.com/anandjaiswal" target="_blank" rel="noreferrer" className="sys-social-link">
+          <a href="https://github.com/Sterben230703" target="_blank" rel="noreferrer" className="sys-social-link">
             <GithubIcon />
           </a>
-          <a href="https://linkedin.com/in/anandjaiswal" target="_blank" rel="noreferrer" className="sys-social-link">
+          <a href="https://www.linkedin.com/in/abstractanand/" target="_blank" rel="noreferrer" className="sys-social-link">
             <LinkedinIcon />
           </a>
         </div>
