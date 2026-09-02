@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useTheme } from './ThemeProvider';
 import { useAuth } from './AuthProvider';
 
 const GithubIcon = () => (
@@ -18,24 +17,13 @@ const LinkedinIcon = () => (
 );
 
 export default function Topbar() {
-  const { theme, setTheme } = useTheme();
   const { isDevMode } = useAuth();
   const pathname = usePathname();
-  const isSystem = theme === 'system';
-  const isStudio = theme === 'studio';
-
-  const themeSwitcher = (
-    <div className="theme-comparison" role="group" aria-label="Choose visual identity">
-      {([['classic', 'DEV'], ['system', 'ATLAS'], ['studio', 'STUDIO']] as const).map(([value, label]) => (
-        <button key={value} onClick={() => setTheme(value)} aria-pressed={theme === value} className={theme === value ? 'active' : ''}>{label}</button>
-      ))}
-    </div>
-  );
 
   const links = [
     { href: '/', label: 'Home' },
     { href: '/blog', label: 'Blogs' },
-    { href: '/projects', label: isStudio ? 'Work' : 'Projects' },
+    { href: '/projects', label: 'Projects' },
     { href: '/about', label: 'About' },
     ...(isDevMode ? [{ href: '/logs', label: 'Logs' }] : []),
   ];
@@ -43,45 +31,11 @@ export default function Topbar() {
   const isActive = (href: string) =>
     href === '/' ? pathname === '/' : pathname.startsWith(href);
 
-  if (isSystem) {
-    return (
-      <header className="topbar topbar-system">
-        <Link href="/" className="topbar-name">
-          <span className="topbar-title">Anand Jaiswal</span>
-          <span className="topbar-sub">Technical field atlas</span>
-        </Link>
-
-        <nav className="topbar-nav">
-          {links.map(link => {
-            const active = isActive(link.href);
-            return (
-              <Link key={link.href} href={link.href}
-                className={`topbar-link topbar-link-system ${active ? 'topbar-link-active-system' : ''}`}>
-                {active && <span className="topbar-prefix">&gt;</span>}
-                {link.label}
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="topbar-actions">
-          <a href="https://github.com/Dev-an01" target="_blank" rel="noreferrer" className="sys-social-link">
-            <GithubIcon />
-          </a>
-          <a href="https://www.linkedin.com/in/abstractanand/" target="_blank" rel="noreferrer" className="sys-social-link">
-            <LinkedinIcon />
-          </a>
-          {themeSwitcher}
-        </div>
-      </header>
-    );
-  }
-
   return (
-    <header className={`topbar ${isStudio ? 'topbar-studio' : 'topbar-classic'}`}>
+    <header className="topbar topbar-system">
       <Link href="/" className="topbar-name">
-        <span className="topbar-title">{isStudio ? 'Anand Jaiswal / Studio' : 'anand@portfolio'}</span>
-        <span className="topbar-sub">{isStudio ? 'work · writing · experience' : 'backend · systems · ai'}</span>
+        <span className="topbar-title">Anand Jaiswal</span>
+        <span className="topbar-sub">Technical field atlas</span>
       </Link>
 
       <nav className="topbar-nav">
@@ -89,7 +43,8 @@ export default function Topbar() {
           const active = isActive(link.href);
           return (
             <Link key={link.href} href={link.href}
-              className={`topbar-link topbar-link-classic ${active ? 'topbar-link-active-classic' : ''}`}>
+              className={`topbar-link topbar-link-system ${active ? 'topbar-link-active-system' : ''}`}>
+              {active && <span className="topbar-prefix">&gt;</span>}
               {link.label}
             </Link>
           );
@@ -103,7 +58,6 @@ export default function Topbar() {
         <a href="https://www.linkedin.com/in/abstractanand/" target="_blank" rel="noreferrer" className="sys-social-link">
           <LinkedinIcon />
         </a>
-        {themeSwitcher}
       </div>
     </header>
   );

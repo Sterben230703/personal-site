@@ -1906,6 +1906,24 @@ article blockquote {
   text-align: center;
 }
 
+.blog-load-error {
+  margin: 0 0 1.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--accent-primary);
+  background: var(--surface);
+  color: var(--text-heading);
+}
+
+.blog-load-error button {
+  border: 0;
+  background: transparent;
+  color: var(--accent-primary);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
 /* ========== Responsive ========== */
 
 @media (max-width: 767px) {

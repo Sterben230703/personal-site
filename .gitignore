@@ -20,6 +20,10 @@
 # production
 /build
 
+# generated local artifacts
+/output/
+/tmp/
+
 # misc
 .DS_Store
 *.pem
@@ -32,11 +36,19 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # local AI-agent configuration
 /.agent/
 /.agents/
 /.claude/
+/.codex/
+/.impeccable/
+/.gstack/
+
+# local editor configuration
+/.idea/
+/.vscode/
 
 # vercel
 .vercel
@@ -44,7 +56,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-.gstack/
 
 # impeccable-ignore-start
 # Ephemeral output, runtime state, and per-developer overrides.
@@ -61,3 +72,4 @@ next-env.d.ts
 .impeccable/live/cache/
 .impeccable/live/*.png
 # impeccable-ignore-end
+.gstack/

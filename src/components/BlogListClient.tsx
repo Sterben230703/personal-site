@@ -32,9 +32,11 @@ export default function BlogListClient() {
   const [showEditor, setShowEditor] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [flagsExpanded, setFlagsExpanded] = useState(false);
+  const [loadError, setLoadError] = useState('');
 
   const fetchBlogs = async () => {
     setLoading(true);
+    setLoadError('');
     try {
       const params = new URLSearchParams();
       params.set('order', sortOrder);
@@ -46,6 +48,7 @@ export default function BlogListClient() {
     } catch (err) {
       console.error('Failed to fetch blogs:', err);
       setBlogs([]);
+      setLoadError('Blogs are temporarily unavailable. Please try again shortly.');
     } finally {
       setLoading(false);
     }
@@ -141,6 +144,12 @@ export default function BlogListClient() {
             </button>
           )}
         </header>
+      )}
+
+      {loadError && (
+        <p role="alert" className="blog-load-error">
+          {loadError} <button type="button" onClick={fetchBlogs}>Retry</button>
+        </p>
       )}
 
       {/* Filters */}

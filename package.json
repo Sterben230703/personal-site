@@ -13,9 +13,7 @@
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
-    "gray-matter": "^4.0.3",
     "jsonwebtoken": "^9.0.3",
-    "luxon": "^3.6.1",
     "marked": "^15.0.12",
     "mongoose": "^8.17.2",
     "next": "15.3.4",

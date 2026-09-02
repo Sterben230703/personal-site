@@ -21,11 +21,14 @@ export async function GET(request: NextRequest) {
     if (category) filter.category = category;
     if (tag) filter.tags = tag;
 
-    const blogs = await Blog.find(filter).sort({ [sort]: order }).lean();
+    const blogs = await Blog.find(filter)
+      .select('title slug date category tags summary published')
+      .sort({ [sort]: order })
+      .lean();
     return NextResponse.json(blogs);
   } catch (error) {
     console.error('Failed to fetch blogs:', error);
-    return NextResponse.json([], { status: 200 });
+    return NextResponse.json({ error: 'Blog service unavailable' }, { status: 503 });
   }
 }
 

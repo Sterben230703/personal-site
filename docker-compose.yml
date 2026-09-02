@@ -2,30 +2,16 @@ services:
   app:
     build: .
     container_name: personal-site
+    init: true
     ports:
       - "3000:3000"
     environment:
-      - MONGODB_URI=mongodb://mongo:27017/personal-site
+      - MONGODB_URI=${MONGODB_URI:?Set MONGODB_URI in .env}
       - DEV_USERNAME=${DEV_USERNAME}
       - DEV_PASSWORD=${DEV_PASSWORD}
       - JWT_SECRET=${JWT_SECRET}
       - GITHUB_TOKEN=${GITHUB_TOKEN}
-    depends_on:
-      mongo:
-        condition: service_healthy
+      - NODE_OPTIONS=--max-old-space-size=192
+    mem_limit: 256m
+    pids_limit: 100
     restart: unless-stopped
-
-  mongo:
-    image: mongo:7
-    container_name: personal-site-mongo
-    volumes:
-      - mongo_data:/data/db
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-
-volumes:
-  mongo_data:
