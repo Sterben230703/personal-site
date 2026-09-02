@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { marked } from 'marked';
 import { useAuth } from './AuthProvider';
@@ -74,7 +75,14 @@ export default function ProjectDetailClient({ slug }: { slug: string }) {
       )}
 
       {project.image && (
-        <img src={project.image} alt={project.name} style={{ width: '100%', maxHeight: '300px', objectFit: 'cover', borderRadius: '0.5rem', marginBottom: '1rem' }} />
+        <Image
+          src={project.image}
+          alt={project.name}
+          width={1200}
+          height={600}
+          sizes="(max-width: 768px) 100vw, 960px"
+          style={{ width: '100%', height: 'auto', maxHeight: '300px', objectFit: 'cover', borderRadius: '0.5rem', marginBottom: '1rem' }}
+        />
       )}
 
       <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>{project.name}</h1>
