@@ -58,11 +58,18 @@ export default function ProjectListClient() {
   }
 
   const isSystem = theme === 'system';
+  const isStudio = theme === 'studio';
 
   return (
-    <div>
+    <div className={isStudio ? 'studio-index studio-projects' : undefined}>
       {/* Header */}
-      {isSystem ? (
+      {isStudio ? (
+        <header className="studio-index-header">
+          <h1>Selected work, without the sales pitch.</h1>
+          <p>What I built, which constraints shaped it, and the result you can inspect.</p>
+          {isDevMode && <button onClick={() => setShowEditor(true)} className="btn-primary">+ ADD PROJECT</button>}
+        </header>
+      ) : isSystem ? (
         <header style={{ marginBottom: '2rem', borderBottom: '2px solid #000', paddingBottom: '1.5rem' }}>
           <h1 style={{ fontSize: '2rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '-0.025em', marginBottom: '0.5rem' }}>
             System Gallery
@@ -98,9 +105,9 @@ export default function ProjectListClient() {
       )}
 
       {loading ? (
-        <p>{isSystem ? 'LOADING_MODULES...' : 'Loading projects...'}</p>
+        <p>{isStudio ? 'Loading selected work…' : isSystem ? 'LOADING_MODULES...' : 'Loading projects...'}</p>
       ) : projects.length === 0 ? (
-        <p>{isSystem ? 'NO_MODULES_FOUND.' : 'No projects yet.'}</p>
+        <p>{isStudio ? 'No published projects yet.' : isSystem ? 'NO_MODULES_FOUND.' : 'No projects yet.'}</p>
       ) : (
         <div style={{
           display: 'grid',

@@ -39,7 +39,7 @@ function SystemCard({ slug, name, description, techStack, category, github, live
   const moduleNum = String((index || 0) + 1).padStart(3, '0');
 
   return (
-    <Link href={`/projects/${slug}`} className="project-card-system">
+    <article className="project-card-system">
       <div className="project-card-terminal-header">
         <div style={{ display: 'flex', gap: '6px' }}>
           <span className="project-dot" style={{ backgroundColor: catStyle.dot }} />
@@ -58,7 +58,7 @@ function SystemCard({ slug, name, description, techStack, category, github, live
           </div>
         )}
 
-        <h3 className="project-title-system">{name.toUpperCase()}</h3>
+        <h3 className="project-title-system"><Link href={`/projects/${slug}`}>{name.toUpperCase()}</Link></h3>
 
         <p style={{ fontSize: '12px', lineHeight: 1.6, opacity: 0.8, marginBottom: '1.5rem', flexGrow: 1 }}>
           {description}
@@ -76,7 +76,7 @@ function SystemCard({ slug, name, description, techStack, category, github, live
           {!github && !live && <span style={{ opacity: 0.4 }}>::  SOURCE_PENDING</span>}
         </div>
       </div>
-    </Link>
+    </article>
   );
 }
 
@@ -87,7 +87,7 @@ function ClassicCard({ slug, name, description, category, github, live }: Projec
   const isGradient = catStyle.bar.includes('gradient');
 
   return (
-    <Link href={`/projects/${slug}`} className="project-card-classic">
+    <article className="project-card-classic">
       {/* Top accent bar */}
       <div
         className="project-card-accent-bar"
@@ -105,7 +105,7 @@ function ClassicCard({ slug, name, description, category, github, live }: Projec
         )}
 
         {/* Title */}
-        <h3 className="project-title-classic">{name}</h3>
+        <h3 className="project-title-classic"><Link href={`/projects/${slug}`}>{name}</Link></h3>
 
         {/* Description */}
         <p className="project-desc-classic">
@@ -127,6 +127,21 @@ function ClassicCard({ slug, name, description, category, github, live }: Projec
           {!github && !live && <span style={{ opacity: 0.4 }}>&lt;&gt; SOURCE</span>}
         </div>
       </div>
+    </article>
+  );
+}
+
+function StudioCard({ slug, name, description, techStack, category, index }: ProjectCardProps) {
+  const item = String((index || 0) + 1).padStart(2, '0');
+  return (
+    <Link href={`/projects/${slug}`} className="project-card-studio">
+      <div className="studio-card-index"><span>WORK {item}</span><span>{category || 'SYSTEM'}</span></div>
+      <div className="studio-card-node" aria-hidden="true"><i /><i /><i /></div>
+      <p>SELECTED PROJECT</p>
+      <h3>{name}</h3>
+      <p className="studio-card-description">{description}</p>
+      <div className="studio-card-stack">{techStack.slice(0, 4).map(tech => <span key={tech}>{tech}</span>)}</div>
+      <strong>Open project <span aria-hidden="true">↗</span></strong>
     </Link>
   );
 }
@@ -136,5 +151,6 @@ function ClassicCard({ slug, name, description, category, github, live }: Projec
 export default function ProjectCard(props: ProjectCardProps) {
   const { theme } = useTheme();
   if (theme === 'system') return <SystemCard {...props} />;
+  if (theme === 'studio') return <StudioCard {...props} />;
   return <ClassicCard {...props} />;
 }

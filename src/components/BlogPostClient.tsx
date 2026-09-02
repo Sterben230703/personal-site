@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { marked } from 'marked';
 import { useAuth } from './AuthProvider';
+import { useTheme } from './ThemeProvider';
 import BlogEditor from './BlogEditor';
 
 interface BlogData {
@@ -20,6 +21,7 @@ interface BlogData {
 
 export default function BlogPostClient({ slug }: { slug: string }) {
   const { isDevMode } = useAuth();
+  const { theme } = useTheme();
   const router = useRouter();
   const [blog, setBlog] = useState<BlogData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -81,7 +83,7 @@ export default function BlogPostClient({ slug }: { slug: string }) {
   });
 
   return (
-    <div>
+    <div className={theme === 'studio' ? 'studio-detail studio-article' : undefined}>
       {isDevMode && (
         <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
           <button onClick={() => setEditing(true)} className="btn-primary" style={{ fontSize: '0.75rem' }}>
@@ -108,7 +110,7 @@ export default function BlogPostClient({ slug }: { slug: string }) {
         </div>
       </div>
 
-      <article dangerouslySetInnerHTML={{ __html: html }} />
+      <article className="studio-prose" dangerouslySetInnerHTML={{ __html: html }} />
     </div>
   );
 }

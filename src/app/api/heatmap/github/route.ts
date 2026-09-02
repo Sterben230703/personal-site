@@ -28,7 +28,7 @@ async function fetchGithub(): Promise<Record<string, number>> {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ query: QUERY, variables: { login: 'Sterben230703' } }),
+    body: JSON.stringify({ query: QUERY, variables: { login: 'Dev-an01' } }),
   });
 
   const json = await res.json();

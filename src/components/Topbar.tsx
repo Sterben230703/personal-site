@@ -18,15 +18,24 @@ const LinkedinIcon = () => (
 );
 
 export default function Topbar() {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const { isDevMode } = useAuth();
   const pathname = usePathname();
   const isSystem = theme === 'system';
+  const isStudio = theme === 'studio';
+
+  const themeSwitcher = (
+    <div className="theme-comparison" role="group" aria-label="Choose visual identity">
+      {([['classic', 'DEV'], ['system', 'ATLAS'], ['studio', 'STUDIO']] as const).map(([value, label]) => (
+        <button key={value} onClick={() => setTheme(value)} aria-pressed={theme === value} className={theme === value ? 'active' : ''}>{label}</button>
+      ))}
+    </div>
+  );
 
   const links = [
     { href: '/', label: 'Home' },
     { href: '/blog', label: 'Blogs' },
-    { href: '/projects', label: 'Projects' },
+    { href: '/projects', label: isStudio ? 'Work' : 'Projects' },
     { href: '/about', label: 'About' },
     ...(isDevMode ? [{ href: '/logs', label: 'Logs' }] : []),
   ];
@@ -37,10 +46,10 @@ export default function Topbar() {
   if (isSystem) {
     return (
       <header className="topbar topbar-system">
-        <div className="topbar-name">
-          <span className="topbar-title">[ANAND_JAISWAL]</span>
-          <span className="topbar-sub">CORE_INDEX_V2.0.4</span>
-        </div>
+        <Link href="/" className="topbar-name">
+          <span className="topbar-title">Anand Jaiswal</span>
+          <span className="topbar-sub">Technical field atlas</span>
+        </Link>
 
         <nav className="topbar-nav">
           {links.map(link => {
@@ -56,26 +65,24 @@ export default function Topbar() {
         </nav>
 
         <div className="topbar-actions">
-          <a href="https://github.com/Sterben230703" target="_blank" rel="noreferrer" className="sys-social-link">
+          <a href="https://github.com/Dev-an01" target="_blank" rel="noreferrer" className="sys-social-link">
             <GithubIcon />
           </a>
           <a href="https://www.linkedin.com/in/abstractanand/" target="_blank" rel="noreferrer" className="sys-social-link">
             <LinkedinIcon />
           </a>
-          <button className="sys-theme-toggle topbar-theme-btn" onClick={toggleTheme}>
-            <span className="material-icons-round" style={{ fontSize: '1rem' }}>contrast</span>
-          </button>
+          {themeSwitcher}
         </div>
       </header>
     );
   }
 
   return (
-    <header className="topbar topbar-classic">
-      <div className="topbar-name">
-        <span className="topbar-title">[ANAND_JAISWAL]</span>
-        <span className="topbar-sub">AI &amp; Backend Eng.</span>
-      </div>
+    <header className={`topbar ${isStudio ? 'topbar-studio' : 'topbar-classic'}`}>
+      <Link href="/" className="topbar-name">
+        <span className="topbar-title">{isStudio ? 'Anand Jaiswal / Studio' : 'anand@portfolio'}</span>
+        <span className="topbar-sub">{isStudio ? 'work · writing · experience' : 'backend · systems · ai'}</span>
+      </Link>
 
       <nav className="topbar-nav">
         {links.map(link => {
@@ -90,16 +97,13 @@ export default function Topbar() {
       </nav>
 
       <div className="topbar-actions">
-        <a href="https://github.com/Sterben230703" target="_blank" rel="noreferrer" className="sys-social-link">
+        <a href="https://github.com/Dev-an01" target="_blank" rel="noreferrer" className="sys-social-link">
           <GithubIcon />
         </a>
         <a href="https://www.linkedin.com/in/abstractanand/" target="_blank" rel="noreferrer" className="sys-social-link">
           <LinkedinIcon />
         </a>
-        <button className="sys-theme-toggle topbar-theme-btn" onClick={toggleTheme}>
-          <span className="material-icons-round" style={{ fontSize: '1rem' }}>contrast</span>
-          TOGGLE
-        </button>
+        {themeSwitcher}
       </div>
     </header>
   );

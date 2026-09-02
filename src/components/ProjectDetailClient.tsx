@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { marked } from 'marked';
 import { useAuth } from './AuthProvider';
+import { useTheme } from './ThemeProvider';
 import ProjectEditor from './ProjectEditor';
 
 interface ProjectData {
@@ -20,6 +21,7 @@ interface ProjectData {
 
 export default function ProjectDetailClient({ slug }: { slug: string }) {
   const { isDevMode } = useAuth();
+  const { theme } = useTheme();
   const router = useRouter();
   const [project, setProject] = useState<ProjectData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -63,7 +65,7 @@ export default function ProjectDetailClient({ slug }: { slug: string }) {
   const html = project.longDescription ? marked.parse(project.longDescription) as string : '';
 
   return (
-    <div>
+    <div className={theme === 'studio' ? 'studio-detail studio-project-detail' : undefined}>
       {isDevMode && (
         <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
           <button onClick={() => setEditing(true)} className="btn-primary" style={{ fontSize: '0.75rem' }}>Edit</button>
@@ -97,7 +99,7 @@ export default function ProjectDetailClient({ slug }: { slug: string }) {
         )}
       </div>
 
-      {html && <article dangerouslySetInnerHTML={{ __html: html }} />}
+      {html && <article className="studio-prose" dangerouslySetInnerHTML={{ __html: html }} />}
     </div>
   );
 }

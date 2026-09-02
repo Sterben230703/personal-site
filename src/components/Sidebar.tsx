@@ -68,7 +68,7 @@ export default function Sidebar() {
             <p># STATUS: ONLINE</p>
           </div>
           <div className="sys-sidebar-socials">
-            <a href="https://github.com/Sterben230703" target="_blank" rel="noreferrer" className="sys-social-link">
+            <a href="https://github.com/Dev-an01" target="_blank" rel="noreferrer" className="sys-social-link">
               <GithubIcon />
             </a>
             <a href="https://www.linkedin.com/in/abstractanand/" target="_blank" rel="noreferrer" className="sys-social-link">
@@ -124,7 +124,7 @@ export default function Sidebar() {
           <p># STATUS: ONLINE</p>
         </div>
         <div className="sys-sidebar-socials">
-          <a href="https://github.com/Sterben230703" target="_blank" rel="noreferrer" className="sys-social-link">
+          <a href="https://github.com/Dev-an01" target="_blank" rel="noreferrer" className="sys-social-link">
             <GithubIcon />
           </a>
           <a href="https://www.linkedin.com/in/abstractanand/" target="_blank" rel="noreferrer" className="sys-social-link">

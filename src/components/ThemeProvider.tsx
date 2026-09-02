@@ -2,16 +2,18 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
-type Theme = 'classic' | 'system';
+export type Theme = 'classic' | 'system' | 'studio';
 
 interface ThemeContextType {
   theme: Theme;
   toggleTheme: () => void;
+  setTheme: (theme: Theme) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType>({
   theme: 'classic',
   toggleTheme: () => {},
+  setTheme: () => {},
 });
 
 export function useTheme() {
@@ -24,7 +26,7 @@ export default function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const stored = localStorage.getItem('theme') as Theme | null;
-    if (stored === 'classic' || stored === 'system') {
+    if (stored === 'classic' || stored === 'system' || stored === 'studio') {
       setTheme(stored);
     }
     setMounted(true);
@@ -37,9 +39,16 @@ export default function ThemeProvider({ children }: { children: ReactNode }) {
     }
   }, [theme, mounted]);
 
-  const toggleTheme = () => {
-    setTheme(prev => (prev === 'classic' ? 'system' : 'classic'));
+  const transitionTo = (nextTheme: Theme) => {
+    if (nextTheme === theme) return;
+    const changeTheme = () => setTheme(nextTheme);
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const viewTransition = document as Document & { startViewTransition?: (update: () => void) => void };
+    if (!reduceMotion && viewTransition.startViewTransition) viewTransition.startViewTransition(changeTheme);
+    else changeTheme();
   };
+
+  const toggleTheme = () => transitionTo(theme === 'classic' ? 'system' : theme === 'system' ? 'studio' : 'classic');
 
   // Prevent flash of wrong theme
   if (!mounted) {
@@ -47,7 +56,7 @@ export default function ThemeProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme: transitionTo }}>
       {children}
     </ThemeContext.Provider>
   );

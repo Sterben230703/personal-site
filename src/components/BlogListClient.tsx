@@ -108,6 +108,7 @@ export default function BlogListClient() {
   }
 
   const isSystem = theme === 'system';
+  const isStudio = theme === 'studio';
 
   // Build flags list: categories + tags combined for system theme
   const allFlags = [
@@ -118,9 +119,11 @@ export default function BlogListClient() {
   const hasMore = allFlags.length > VISIBLE_FLAGS;
 
   return (
-    <div style={{ maxWidth: '56rem', margin: '0 auto' }}>
+    <div className={isStudio ? 'studio-index studio-writing' : undefined} style={{ maxWidth: '56rem', margin: '0 auto' }}>
       {/* Header */}
-      {isSystem ? (
+      {isStudio ? (
+        isDevMode ? <div className="studio-blog-actions"><button onClick={() => setShowEditor(true)} className="btn-primary">+ NEW POST</button></div> : null
+      ) : isSystem ? (
         <header style={{ marginBottom: '2.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <h1 className="blog-header-system" style={{ margin: 0 }}>System Log</h1>
           {isDevMode && (
@@ -297,15 +300,15 @@ export default function BlogListClient() {
 
           const mono = 'JetBrains Mono, monospace';
           // theme-adaptive values
-          const badgeBg      = isSystem ? '#000'                      : '#fff';
-          const badgeColor   = isSystem ? '#fff'                      : '#000';
-          const lineColor    = isSystem ? '#000'                      : 'rgba(255,255,255,0.3)';
-          const entryBorder  = isSystem ? '1px solid #e2e8f0'         : '1px solid rgba(255,255,255,0.07)';
-          const dateColor    = isSystem ? '#94a3b8'                   : '#6b7280';
-          const titleColor   = isSystem ? '#000'                      : '#fff';
-          const tagBorder    = isSystem ? '1px solid #000'            : '1px solid rgba(255,255,255,0.25)';
-          const tagColor     = isSystem ? '#000'                      : 'var(--text-color)';
-          const hoverBg      = isSystem ? '#f8fafc'                   : 'rgba(255,255,255,0.03)';
+          const badgeBg      = isStudio ? '#1447e6' : isSystem ? '#000' : '#fff';
+          const badgeColor   = isStudio ? '#fffaf0' : isSystem ? '#fff' : '#000';
+          const lineColor    = isStudio ? '#ff4d00' : isSystem ? '#000' : 'rgba(255,255,255,0.3)';
+          const entryBorder  = isStudio ? '1px solid #161616' : isSystem ? '1px solid #e2e8f0' : '1px solid rgba(255,255,255,0.07)';
+          const dateColor    = isStudio ? '#525252' : isSystem ? '#94a3b8' : '#6b7280';
+          const titleColor   = isStudio ? '#0b0b0b' : isSystem ? '#000' : '#fff';
+          const tagBorder    = isStudio ? '1px solid #1447e6' : isSystem ? '1px solid #000' : '1px solid rgba(255,255,255,0.25)';
+          const tagColor     = isStudio ? '#1447e6' : isSystem ? '#000' : 'var(--text-color)';
+          const hoverBg      = isStudio ? '#ffb79a' : isSystem ? '#f8fafc' : 'rgba(255,255,255,0.03)';
 
           return Object.keys(byMonth)
             .sort((a, b) => b.localeCompare(a))
