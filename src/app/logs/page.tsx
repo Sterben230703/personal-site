@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { marked } from 'marked';
 import { useAuth } from '@/components/AuthProvider';
+import { useTheme } from '@/components/ThemeProvider';
 import LogEditor from '@/components/LogEditor';
 
 interface LogData {
@@ -14,6 +15,7 @@ interface LogData {
 
 export default function LogsPage() {
   const { isDevMode, loading: authLoading } = useAuth();
+  const { theme } = useTheme();
   const [logs, setLogs] = useState<LogData[]>([]);
   const [loading, setLoading] = useState(true);
   const [showEditor, setShowEditor] = useState(false);
@@ -41,7 +43,7 @@ export default function LogsPage() {
 
   if (!isDevMode) {
     return (
-      <div style={{ textAlign: 'center', padding: '2rem' }}>
+      <div className={theme === 'studio' ? 'studio-detail studio-private' : undefined} style={{ textAlign: 'center', padding: '2rem' }}>
         <h1 style={{ fontSize: '1.75rem', fontWeight: 'bold', marginBottom: '1rem' }}>Learning Logs</h1>
         <p>This section is private. Please log in as dev to access.</p>
       </div>
@@ -94,7 +96,7 @@ export default function LogsPage() {
   }
 
   return (
-    <div>
+    <div className={theme === 'studio' ? 'studio-detail studio-private' : undefined}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <h1 style={{ fontSize: '1.75rem', fontWeight: 'bold', margin: 0 }}>Learning Logs</h1>
         <button onClick={() => setShowEditor(true)} className="btn-primary">+ New Log</button>

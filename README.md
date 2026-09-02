@@ -1,39 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Anand Jaiswal's personal site
 
+Next.js portfolio, project archive, public blog, and private learning logs.
 
-This is My first portfolio project
+## Local development
 
-## Getting Started
-
-First, run the development server:
+Copy the environment template and add your MongoDB Atlas URI:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env.local
+npm ci
+npm run dev -- --port 3001
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3001](http://localhost:3001).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## EC2 deployment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The Compose deployment runs only the Next.js application. MongoDB Atlas remains external, avoiding the RAM cost of a MongoDB daemon on the EC2 instance.
 
-## Learn More
+```bash
+cp .env.example .env
+# Edit .env and set production secrets.
+docker compose up -d --build
+```
 
-To learn more about Next.js, take a look at the following resources:
+The production container uses Next.js standalone output, a 192 MB V8 heap ceiling, and a 256 MB container memory limit. The MongoDB client uses at most five pooled connections and releases idle connections after one minute. These defaults target a small EC2 instance; increase both limits together if real traffic produces out-of-memory restarts.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Useful checks:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+docker stats personal-site
+docker compose logs -f app
+curl --fail http://127.0.0.1:3000/
+```
 
-## Deploy on Vercel
+Do not commit `.env`; only `.env.example` belongs in Git.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Vercel deployment
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Add the variables from `.env.example` under **Project Settings → Environment Variables**, then redeploy. For Blogs, `MONGODB_URI` must use an Atlas **database user** and include the database path:
+
+```text
+mongodb+srv://<database-user>:<url-encoded-password>@<cluster>/personal-site?retryWrites=true&w=majority
+```
+
+In Atlas, allow Vercel to reach the cluster in **Network Access**. Because Vercel functions do not have one fixed outbound IP on Hobby, the usual setup is `0.0.0.0/0` together with a strong, least-privilege database user. An Atlas `bad auth` error means the database username/password is incorrect; it is not fixed by changing the frontend.

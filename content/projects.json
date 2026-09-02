@@ -1,10 +1,34 @@
 [
   {
+    "slug": "ai-pr-review-agent",
+    "name": "AI PR Review Agent",
+    "category": "AI",
+    "description": "A multi-agent GitHub review system that combines specialist findings, confidence gates, and human approval before posting.",
+    "longDescription": "AI PR Review Agent is an asynchronous GitHub review service built around four specialist reviewers for security, code quality, tests, and documentation. A FastAPI webhook verifies GitHub signatures and deduplicates deliveries before ARQ and Redis workers fetch the diff and run the reviewers in parallel through LangGraph. The system merges traceable findings, records PostgreSQL event and cost telemetry, and routes uncertain reviews through a human approval gate. Reliability is handled with timeouts, retries, circuit breakers, and idempotent GitHub posting, while a Next.js dashboard exposes review status, findings, confidence, and cost.",
+    "techStack": ["Python", "FastAPI", "LangGraph", "Redis", "PostgreSQL", "Next.js"],
+    "image": "",
+    "github": "",
+    "live": "",
+    "featured": true
+  },
+  {
+    "slug": "moneyplant",
+    "name": "MoneyPlant",
+    "category": "Web",
+    "description": "A Telegram-first personal finance and investment tracker with privacy-aware categorization and a private analytics dashboard.",
+    "longDescription": "MoneyPlant makes expense and investment logging as quick as sending a Telegram message. A deterministic parser handles Indian amount formats, keyword rules categorize common entries without AI, and ambiguous descriptions use a Claude fallback only after the amount is masked. Every entry enters a five-minute correction window before it is committed. The private Next.js dashboard provides transaction management, spending analytics, CSV export, and mutual-fund valuation through AMFI NAV data. The application uses Auth.js, PostgreSQL, Drizzle ORM, grammY, Bun workspaces, and Docker.",
+    "techStack": ["TypeScript", "Next.js", "PostgreSQL", "Drizzle", "grammY", "Docker"],
+    "image": "",
+    "github": "https://github.com/Dev-an01/MoneyPlant",
+    "live": "",
+    "featured": true
+  },
+  {
     "slug": "personal-site",
     "name": "Personal Site",
     "category": "Web",
-    "description": "A personal website built with Next.js 15 featuring a tech blog, project showcase, and dual-theme design.",
-    "longDescription": "This personal website serves as a platform for blogging about technology, showcasing projects, and maintaining private learning logs. Built with Next.js 15, MongoDB, and a custom theme system with classic and system-aesthetic modes.",
+    "description": "A personal website built with Next.js 15 featuring technical writing, project case studies, private learning logs, and three visual identities.",
+    "longDescription": "This personal website is a public home for technical writing and project case studies, with authenticated private learning logs. It is built with Next.js 15, MongoDB, and a custom three-identity theme system spanning developer, editorial atlas, and kinetic studio directions.",
     "techStack": ["Next.js", "TypeScript", "MongoDB", "Tailwind CSS"],
     "image": "",
     "github": "",
